@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MyQuizzer</string>
+    <string name="sets">Sets</string>
 </resources>
