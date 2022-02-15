@@ -22,12 +22,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 public class QuestionsActivity extends AppCompatActivity {
+
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference();
+
 
     public static final String FILE_NAME="QUIZZER";
     public static final String KEY_NAME="QUESTIONS";
@@ -41,7 +50,7 @@ public class QuestionsActivity extends AppCompatActivity {
     private int position=0;
     private int score=0;
     private String category;
-    private int setno;
+    private int setNo;
     private Dialog loadingDialog;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
@@ -64,40 +73,60 @@ public class QuestionsActivity extends AppCompatActivity {
         preferences=getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         editor=preferences.edit();
 
+        category = getIntent().getStringExtra("category");
+        setNo = getIntent().getIntExtra("setNo", 1);
+
+
         list = new ArrayList<>();
-        list.add(new QuestionModel("question 1", "a", "b", "c", "d", "a"));
-        list.add(new QuestionModel("question 2", "a", "b", "c", "d", "b"));
-        list.add(new QuestionModel("question 3", "a", "b", "c", "d", "c"));
-        list.add(new QuestionModel("question 4", "a", "b", "c", "d", "d"));
-        list.add(new QuestionModel("question 5", "a", "b", "c", "d", "a"));
-        list.add(new QuestionModel("question 6", "a", "b", "c", "d", "b"));
 
-        for(int i =0 ; i < 4; i++){
-            optionsContainer.getChildAt(i).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    checkAnswer((Button) v);
-                }
-            });
-        }
-
-
-        playanim(questions, 0, list.get(position).getQuestion());
-        nextbtn.setOnClickListener(new View.OnClickListener() {
+        myRef.child("SETS").child(category).child("questions").orderByChild("setNo").equalTo(setNo).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onClick(View v) {
-                nextbtn.setEnabled(false);
-                nextbtn.setAlpha(0.7f);
-                enableOption(true);
-                position++;
-                if (position == list.size()){
-                    ////Score Activity
-                    return;
+            public void onDataChange(@NonNull DataSnapshot snapshot2) {
+                for (DataSnapshot snapshot : snapshot2.getChildren()){
+                    list.add(snapshot.getValue(QuestionModel.class));
                 }
-                count=0;
-                playanim(questions, 0, list.get(position).getQuestion());
+                if(list.size() > 0){
+
+                    for(int i =0 ; i < 4; i++){
+                        optionsContainer.getChildAt(i).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                checkAnswer((Button) v);
+                            }
+                        });
+                    }
+
+                    playanim(questions, 0, list.get(position).getQuestion());
+
+                    nextbtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            nextbtn.setEnabled(false);
+                            nextbtn.setAlpha(0.7f);
+                            enableOption(true);
+                            position++;
+                            if (position == list.size()){
+                                ////Score Activity
+                                return;
+                            }
+                            count=0;
+                            playanim(questions, 0, list.get(position).getQuestion());
+                        }
+                    });
+                }else {
+                    finish();
+                    Toast.makeText(QuestionsActivity.this, "No questions", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(QuestionsActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+
+
+
     }
 
 
