@@ -25,6 +25,7 @@ public class CategoriesActivity extends AppCompatActivity {
     DatabaseReference myRef = database.getReference();
 
     private RecyclerView recyclerView;
+    private List<CategoryModel> list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,26 +46,22 @@ public class CategoriesActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(layoutManager);
 
-        List<CategoryModel> list = new ArrayList<>();
-        list.add(new CategoryModel("", "Category1"));
-        list.add(new CategoryModel("", "Category1"));
-        list.add(new CategoryModel("", "Category1"));
-        list.add(new CategoryModel("", "Category1"));
-        list.add(new CategoryModel("", "Category1"));
-        list.add(new CategoryModel("", "Category1"));
-
+        list = new ArrayList<>();
         CategoryAdapter adapter = new CategoryAdapter(list);
         recyclerView.setAdapter(adapter);
 
-        myRef.child("Categories").child("category1").child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+        myRef.child("Categories").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Toast.makeText(CategoriesActivity.this  , snapshot.getValue().toString(), Toast.LENGTH_SHORT).show();
+                for (DataSnapshot DataSnapshot1 : snapshot.getChildren()){
+                    list.add(DataSnapshot1.getValue(CategoryModel.class));
+                }
+                adapter.notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Toast.makeText(CategoriesActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
