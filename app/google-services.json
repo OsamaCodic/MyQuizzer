@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "8509203367",
+    "project_id": "myquizzer-f357d",
+    "storage_bucket": "myquizzer-f357d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:8509203367:android:b0132c9f0cf10a2dfd0c82",
+        "android_client_info": {
+          "package_name": "com.example.myquizzer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "8509203367-65bmtig1q3vio90ik2kubfpg8ec3ve67.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApOiTER2B5FP73JUSqGpDdy-X6RNSBmZQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "8509203367-65bmtig1q3vio90ik2kubfpg8ec3ve67.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
