@@ -76,8 +76,15 @@ public class QuestionsActivity extends AppCompatActivity {
         category = getIntent().getStringExtra("category");
         setNo = getIntent().getIntExtra("setNo", 1);
 
+        loadingDialog = new Dialog(this);
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_corner));
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
 
         list = new ArrayList<>();
+
+        loadingDialog.show();
 
         myRef.child("SETS").child(category).child("questions").orderByChild("setNo").equalTo(setNo).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -106,7 +113,13 @@ public class QuestionsActivity extends AppCompatActivity {
                             enableOption(true);
                             position++;
                             if (position == list.size()){
-                                ////Score Activity
+
+                                Intent scoreIntent = new Intent(QuestionsActivity.this, ScoreActivity.class);
+
+                                scoreIntent.putExtra("score", score);
+                                scoreIntent.putExtra("total", list.size());
+                                startActivity(scoreIntent);
+                                finish();
                                 return;
                             }
                             count=0;
@@ -117,11 +130,14 @@ public class QuestionsActivity extends AppCompatActivity {
                     finish();
                     Toast.makeText(QuestionsActivity.this, "No questions", Toast.LENGTH_SHORT).show();
                 }
+                loadingDialog.dismiss();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(QuestionsActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                loadingDialog.dismiss();
+                finish();
             }
         });
 
